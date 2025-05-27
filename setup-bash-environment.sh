@@ -22,7 +22,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-GITHUB_REPO="https://raw.githubusercontent.com/barungh/bash_customization/main"
+GITHUB_REPO="https://raw.githubusercontent.com/barungh/bash_customization/master"
 BACKUP_DIR="$HOME/.bash_backup_$(date +%Y%m%d_%H%M%S)"
 
 # =============================================================================
@@ -721,12 +721,19 @@ main() {
     local distro=$(detect_distro)
     log_info "Detected distribution: $distro"
 
-    # Confirm with user
-    read -p "Do you want to continue? (y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        log_info "Setup cancelled by user"
-        exit 0
+    # Confirm with user (auto-proceed if piped from curl)
+    if [ -t 0 ]; then
+        # Interactive terminal
+        read -p "Do you want to continue? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Setup cancelled by user"
+            exit 0
+        fi
+    else
+        # Non-interactive (piped from curl)
+        log_info "Non-interactive mode detected, proceeding automatically..."
+        sleep 2
     fi
 
     # Create backup

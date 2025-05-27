@@ -45,7 +45,7 @@ curl -fsSL https://raw.githubusercontent.com/barungh/bash_customization/master/i
 
 1. **Clone or download the script:**
    ```bash
-   wget https://raw.githubusercontent.com/barungh/bash_customization/main/setup-bash-environment.sh
+   wget https://raw.githubusercontent.com/barungh/bash_customization/master/setup-bash-environment.sh
    chmod +x setup-bash-environment.sh
    ```
 
@@ -134,6 +134,16 @@ The script creates several files for easy customization:
 - `~/.bash_cheatsheet.md` - Command reference
 
 ## 🐛 Troubleshooting
+
+### Arch Linux Hanging Issue
+If the script appears to hang on Arch Linux after detecting the distribution, it's likely waiting for user input. The script now auto-detects when it's being piped from curl and proceeds automatically. If you still encounter issues:
+
+```bash
+# Download and run manually
+wget https://raw.githubusercontent.com/barungh/bash_customization/master/setup-bash-environment.sh
+chmod +x setup-bash-environment.sh
+./setup-bash-environment.sh
+```
 
 ### FZF Issues
 If FZF doesn't work after installation:
