@@ -779,7 +779,7 @@ main() {
     log_info "Setup completed successfully!"
 }
 
-# Run main function if script is executed directly
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+# Run main function if script is executed directly or piped from curl
+if [[ "${BASH_SOURCE[0]:-$0}" == "${0}" ]] || [[ "${0}" == "bash" ]]; then
     main "$@"
 fi

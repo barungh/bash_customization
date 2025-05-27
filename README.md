@@ -34,7 +34,11 @@ A comprehensive shell script that transforms any Linux machine into a productivi
 ### One-Line Installation
 
 ```bash
+# Direct installation
 curl -fsSL https://raw.githubusercontent.com/barungh/bash_customization/main/setup-bash-environment.sh | bash
+
+# Or using the installer wrapper
+curl -fsSL https://raw.githubusercontent.com/barungh/bash_customization/main/install.sh | bash
 ```
 
 ### Manual Installation
