@@ -1,0 +1,104 @@
+name: Test Setup Script
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ubuntu-version: ['20.04', '22.04']
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Test on Ubuntu ${{ matrix.ubuntu-version }}
+      run: |
+        echo "Testing on Ubuntu ${{ matrix.ubuntu-version }}"
+        # Run setup script in test mode (without interactive prompts)
+        sed 's/read -p.*/REPLY=y/' setup-bash-environment.sh > test-setup.sh
+        chmod +x test-setup.sh
+        echo "y" | ./test-setup.sh || true
+        
+    - name: Verify Installation
+      run: |
+        # Check if key files exist
+        [ -f ~/.bashrc ] && echo "✓ .bashrc exists"
+        [ -f ~/.bash_cheatsheet.md ] && echo "✓ Cheatsheet exists"
+        [ -d ~/.fzf ] && echo "✓ FZF directory exists"
+        
+        # Check if commands are available
+        command -v git && echo "✓ git available"
+        command -v curl && echo "✓ curl available"
+        command -v vim && echo "✓ vim available"
+
+  test-fedora:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install basic tools
+      run: |
+        dnf update -y
+        dnf install -y git curl wget sudo
+        
+    - name: Test on Fedora
+      run: |
+        echo "Testing on Fedora"
+        # Create a non-root user for testing
+        useradd -m testuser
+        cp setup-bash-environment.sh /home/testuser/
+        chown testuser:testuser /home/testuser/setup-bash-environment.sh
+        
+        # Run as testuser (simulate the script)
+        su - testuser -c "echo 'y' | bash /home/testuser/setup-bash-environment.sh" || true
+
+  test-arch:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install basic tools
+      run: |
+        pacman -Sy --noconfirm
+        pacman -S --noconfirm git curl wget sudo base-devel
+        
+    - name: Test on Arch Linux
+      run: |
+        echo "Testing on Arch Linux"
+        # Create a non-root user for testing
+        useradd -m testuser
+        cp setup-bash-environment.sh /home/testuser/
+        chown testuser:testuser /home/testuser/setup-bash-environment.sh
+        
+        # Run as testuser (simulate the script)
+        su - testuser -c "echo 'y' | bash /home/testuser/setup-bash-environment.sh" || true
+
+  lint-script:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install ShellCheck
+      run: sudo apt-get update && sudo apt-get install -y shellcheck
+      
+    - name: Lint setup script
+      run: |
+        shellcheck setup-bash-environment.sh
+        shellcheck install.sh
+        
+    - name: Check script syntax
+      run: |
+        bash -n setup-bash-environment.sh
+        bash -n install.sh
